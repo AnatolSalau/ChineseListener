@@ -1,0 +1,71 @@
+---
+description: Layered architecture, Kotlin idioms, UDF/MVVM, and Android boundaries for ChineseListener
+globs: "**/*.kt,**/*.kts"
+alwaysApply: false
+---
+
+# Architecture & patterns (strict)
+
+Read `docs/ANDROID_PRACTICES.md` for full rationale and links. **These rules are mandatory** for new and changed code.
+
+## Layer rules
+
+1. **Dependency direction:** `ui` → `presentation` → `domain` ← `data`. Platform adapters implement ports; **domain never depends on data or UI**.
+2. **Single module:** feature code lives in `:app` under `com.example.chineselistener` with clear layer packages.
+3. Every file belongs to **ui**, **presentation**, **domain**, **data**, **theme/util**, or **platform** with a clear layer.
+
+## Presentation (UDF / MVVM)
+
+- Expose **`StateFlow<UiState>`** (or equivalent) from presentation; UI collects with lifecycle-aware APIs.
+- **`UiState`:** use **`sealed class` or `data class`**; include **loading, success, error, empty** where relevant.
+- **`UiEvent`:** user actions as sealed types or methods; presentation handles them — **composables do not call repositories**.
+- **No `GlobalScope`**. Use `viewModelScope`, `lifecycleScope`, or an injected scope cancelled by the platform.
+- **No blocking I/O** on main thread; use `suspend` + appropriate dispatcher in data layer.
+
+## Domain
+
+- **Repository interfaces** live in domain; implementations in data.
+- Use cases: small, testable classes or functions; **pure** where possible.
+- **No** Compose or `android.*` imports in domain.
+
+## Data
+
+- Map DTOs → domain models in data layer only.
+- Retries, caching, and API details stay here — not in ViewModels.
+
+## Platform adapters
+
+- **Default:** interface in domain + implementation in `data` or `platform` + fake for unit tests.
+- Keep Android system APIs behind narrow ports.
+
+## Kotlin idioms (required)
+
+| Do | Don't |
+|----|--------|
+| `data class` for DTOs/events | Manual Java-style POJOs |
+| `sealed class` / `sealed interface` for errors & UI variants | Stringly-typed error codes only |
+| `val`, immutability | Mutable shared state without synchronization |
+| Extension functions at boundaries | Deep inheritance hierarchies |
+| Higher-order collection ops when clearer | Imperative `for`/`while` (see `chinese-listener-kotlin-collections.mdc`, `util/KotlinLoopReplacements.kt`) |
+
+Follow [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html).
+
+## Compose (ui layer)
+
+- All screens under **`AppTheme`** (or project theme composable).
+- **Colors:** `MaterialTheme.colorScheme` — **onSurface**, **onPrimary**, **surface** (opaque).
+- Composables: **stateless where possible**; pass `state` + `onEvent`.
+- **No** business rules in `@Composable` beyond formatting for display.
+
+## New dependencies
+
+- Networking, DB, DI libraries — **user approval** + Gradle dependency block update.
+
+## Verification
+
+```text
+./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleDebug
+```
+
+Add **unit tests** for every non-trivial domain/presentation change.

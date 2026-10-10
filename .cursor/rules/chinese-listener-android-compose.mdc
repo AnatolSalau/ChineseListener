@@ -1,0 +1,54 @@
+---
+description: Android + Jetpack Compose standards for ChineseListener
+globs: "**/*.kt,**/*.kts,**/AndroidManifest.xml,**/themes.xml"
+alwaysApply: false
+---
+
+# Android — Compose standards
+
+Complements `chinese-listener-architecture.mdc`, `chinese-listener-energy-efficiency.mdc`, and `docs/ANDROID_PRACTICES.md`.
+
+## Build target
+
+- **Platform:** Android only (single `:app` module unless user approves splits).
+- **minSdk / targetSdk / compileSdk:** values in `app/build.gradle.kts` — do not change without approval.
+- **UI:** **Jetpack Compose** + **Material 3**.
+
+## Module
+
+| Module | Responsibility |
+|--------|----------------|
+| `:app` | Activity, manifest, UI, presentation, domain, data, theme |
+
+## Android window & OLED
+
+- Manifest theme with **values** + **values-night** when applicable.
+- `enableEdgeToEdge` with **opaque** status/navigation scrims aligned to light/dark when using edge-to-edge.
+- Re-test on **physical device** when changing theme or edge-to-edge.
+
+## Toolchain
+
+- Kotlin / AGP / Compose: **only** versions declared in project Gradle files.
+- JVM target: as set in `app/build.gradle.kts` — do not raise without approval.
+
+## Compose checklist (every UI change)
+
+- [ ] Wrapped in app theme composable
+- [ ] Text uses explicit **onSurface** / **onPrimary** (or other `on*` matching background)
+- [ ] State from presentation (`StateFlow` / ViewModel), not ad-hoc globals
+- [ ] Events upward (UDF), no repository calls from composables
+- [ ] `contentDescription` for meaningful images (null only for decorative)
+
+## API level discipline
+
+- No APIs above `minSdk` without guards or approved `minSdk` bump.
+- Test permission/storage changes on a `minSdk` emulator or device.
+
+## Verification
+
+```bash
+./gradlew :app:assembleDebug
+./gradlew :app:testDebugUnitTest
+```
+
+Windows: `gradlew.bat`. Report unverified work honestly.

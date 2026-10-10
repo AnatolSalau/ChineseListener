@@ -1,0 +1,31 @@
+---
+description: When docs/WHAT_WE_DO.md is referenced, read the full docs/ bundle (all project markdown docs)
+globs: docs/WHAT_WE_DO.md
+alwaysApply: false
+---
+
+# Docs bundle (`@docs/WHAT_WE_DO.md`)
+
+If the user attaches, @-mentions, or references **`docs/WHAT_WE_DO.md`**, treat that as explicit intent to use **all** project documentation under `docs/`, not only that file.
+
+## Required action
+
+Before planning or coding, read the bundle **in order** (Read tool for any file missing from context):
+
+1. `docs/WHAT_WE_DO.md`
+2. `docs/PROJECT.md`
+3. `docs/ANDROID_PRACTICES.md`
+4. `docs/CODE_AND_REFACTOR_STYLE.md`
+5. `docs/ENERGY_EFFICIENCY.md`
+6. `docs/RUN_ON_PHYSICAL_DEVICE.md`
+7. `docs/PATTERNS_REFERENCE.md`
+8. `docs/REFACTOR_GUIDE.md`
+9. `docs/REFACTOR_PLAYBOOK.md` (and `docs/REFACTOR_AUDIT.md` when executing refactors)
+
+Also apply `.cursor/rules/` and skills listed in `WHAT_WE_DO.md` (skills/rules section).
+
+## Maintenance
+
+When adding `docs/*.md`, update the table in `WHAT_WE_DO.md` and this rule’s list in the same change.
+
+Exclude non-markdown under `docs/` (e.g. workspace files) unless the user explicitly includes them.

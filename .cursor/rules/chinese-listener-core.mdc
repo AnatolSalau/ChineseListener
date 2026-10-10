@@ -1,0 +1,72 @@
+---
+description: ChineseListener — core workflow, honesty, engineering principles, change governance
+alwaysApply: true
+---
+
+# ChineseListener — Core Agent Rules
+
+## Mission
+
+Work on the **`:app`** Android module as one product. Follow the **docs bundle** from `docs/WHAT_WE_DO.md` and layered practices in `docs/ANDROID_PRACTICES.md`. Prefer cohesive changes over local patches that ignore package boundaries or power impact.
+
+## Human approval (mandatory)
+
+Before **implementing** non-trivial work, stop and get explicit user approval in chat:
+
+- Multi-file or cross-layer changes (ui ↔ presentation ↔ domain ↔ data)
+- New or upgraded dependencies, AGP/Kotlin/Compose version bumps, CI changes
+- `minSdk` / `targetSdk` / manifest / permission changes
+- New modules or architectural splits
+
+**Required in chat first:** problem statement, root-cause hypothesis (with evidence), proposed approach, files/packages touched, risks, and how success will be verified (Gradle tasks, unit tests, device/emulator).
+
+**Do not** edit code until the user approves. Exceptions: single obvious fixes the user fully specified (e.g. “set minSdk to 28”, “go ahead”).
+
+## Root cause and proven fixes
+
+1. **Reproduce and locate** — read code, Gradle files, logs, and tests; trace UI → presentation → domain → data.
+2. **Identify root cause** — distinguish symptom from cause; cite evidence.
+3. **Fix the cause** — smallest correct change; no speculative refactors with bugfixes.
+4. **Verify** — run relevant Gradle tasks; report what was not verified.
+
+## Do not lie (honesty)
+
+- Never fabricate command output, test results, or file contents.
+- Never claim verification without running checks in this session when feasible.
+- Label guesses as unverified.
+
+## Single source of truth
+
+| Topic | Source of truth |
+|--------|------------------|
+| APIs, packages, UI | Repo `*.kt`, `AndroidManifest.xml`, `build.gradle.kts` |
+| Versions | Root `build.gradle.kts` and `app/build.gradle.kts` — do not invent dependency versions |
+| Android API levels | `minSdk`, `targetSdk`, `compileSdk` in `app/build.gradle.kts` |
+| Kotlin / Android | [Kotlin docs](https://kotlinlang.org/docs/home.html), [Jetpack Compose](https://developer.android.com/jetpack/compose) |
+| Project docs | **`docs/WHAT_WE_DO.md` is the bundle entry** — `@docs/WHAT_WE_DO.md` means read **all** bundle files listed there (see `chinese-listener-docs-bundle.mdc`) |
+
+## Engineering principles
+
+- **SOLID**, **DRY**, **KISS**, **YAGNI**
+- **Strict layering** — see `chinese-listener-architecture.mdc` and `docs/ANDROID_PRACTICES.md` (ui → presentation → domain ← data)
+- **Idiomatic Kotlin** — multi-paradigm: `data class`/`sealed`, immutability, coroutines/Flow, no `GlobalScope`; **same refactor/collection approach as kotlin-mutliplatform-test** (see `chinese-listener-code-style.mdc`, `chinese-listener-kotlin-collections.mdc`, `docs/CODE_AND_REFACTOR_STYLE.md`)
+
+## Quality bar
+
+- **`test`** (unit) required for domain/presentation logic; **instrumented tests** when Android adapters change
+- **UDF:** explicit `UiState` / events; no business logic in composables
+- No secrets in repo (`local.properties` is local-only)
+- Accessibility and lifecycle-aware Compose where UI changes matter
+- **Energy efficiency:** lifecycle-scoped coroutines, no default polling; see `chinese-listener-energy-efficiency.mdc`
+- External guidance: [Android app architecture](https://developer.android.com/topic/architecture), [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html)
+
+## Git (read-only analysis; no push)
+
+**Never push.** Allowed: `status`, `log`, `show`, `diff`, `blame`. No commit/merge/rebase unless the user explicitly asks in that conversation.
+
+## Communication and citations (mandatory in chat)
+
+| Claim type | Citation |
+|------------|----------|
+| Project code/config | `startLine:endLine:path` from files read this session |
+| External docs | Full `https://...` URL |

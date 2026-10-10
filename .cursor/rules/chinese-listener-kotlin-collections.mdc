@@ -1,0 +1,22 @@
+---
+description: Mandatory Kotlin collections/stdlib — no imperative for/while anywhere in project Kotlin sources
+globs: "**/*.kt"
+alwaysApply: true
+---
+
+# Kotlin collections (mandatory, no exceptions)
+
+In **all Kotlin sources** (`app`, tests):
+
+1. **Do not** use imperative `for` / `while` / `do-while`. Use stdlib **collection operations** (`map`, `filter`, `flatMap`, `fold`, `reduce`, `firstNotNullOfOrNull`, `maxByOrNull`, `groupBy`, `partition`, `buildList`, `lineSequence`, `asSequence`, `generateSequence`, `consumeEach` on channels, `sumOf`, `any`/`all`, etc.).
+2. **Prefer** immutable pipelines; `buildList` / `buildMap` / `buildString` for construction.
+3. **Suspend sequential work:** recursive `fold` on `List`, `consumeEach` for channels, or `fold` + sealed state — not channel `for`.
+4. **Angle / range normalization:** `tailrec` helpers or `wrapDegrees` — see `util/KotlinLoopReplacements.kt` — not `while` on `var`.
+5. **Indexed scans:** `scanForwardIndex`, `scanBackwardIndex`, `scanForwardByOne`, `scanBackwardByOne` in `KotlinLoopReplacements.kt` — not C-style index loops.
+6. **Indexed numeric ranges:** `(0 until n)`, `(start until end step stride)`, `generateSequence`, not C-style loops.
+
+## Verification
+
+After refactors: `:app:testDebugUnitTest` `:app:assembleDebug`.
+
+**SSOT:** [CODE_AND_REFACTOR_STYLE.md](../docs/CODE_AND_REFACTOR_STYLE.md) · [REFACTOR_PLAYBOOK.md](../docs/REFACTOR_PLAYBOOK.md) §4 · [Kotlin collection operations](https://kotlinlang.org/docs/collection-operations.html)

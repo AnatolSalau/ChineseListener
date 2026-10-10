@@ -1,0 +1,46 @@
+---
+description: Full-app refactor — mandatory REFACTOR_GUIDE Phases 0–7, PATTERNS_REFERENCE, audit, verification
+globs: "**/*.kt,**/*.kts,docs/REFACTOR_*.md,docs/PATTERNS_REFERENCE.md"
+alwaysApply: false
+---
+
+# Refactor program
+
+Before **structural or style refactors** across the codebase, read in order:
+
+1. **`docs/PATTERNS_REFERENCE.md`** — pattern names (PR-§*n*)
+2. **`docs/REFACTOR_GUIDE.md`** — **mandatory Phases 0–7**
+3. **`docs/REFACTOR_AUDIT.md`** — next row + per-batch principle checklist
+4. **`docs/REFACTOR_PLAYBOOK.md`** — Kotlin §4 matrix and Gradle commands
+
+## Order (mandatory)
+
+Follow **REFACTOR_GUIDE** phases; do not skip architecture (Phase 3) for style-only edits.
+
+1. Phase 0 — plan / approval
+2. Phase 1 — PR-§1 principles + stop-ship
+3. Phase 2 — GRASP roles
+4. Phase 3 — layers, ports, UDF
+5. Phase 4 — GoF/integration pattern tags
+6. Phase 5 — algorithms + tests for logic changes
+7. Phase 6 — concurrency, **Kotlin collections (mandatory: `chinese-listener-kotlin-collections.mdc`)**, testing
+8. Phase 7 — verify + audit checklist
+
+## Constraints
+
+- Do **not** contradict `docs/ANDROID_PRACTICES.md` or `.cursor/rules/chinese-listener-architecture.mdc`.
+- Do **not** introduce PR-§3 out-of-scope styles (microservices, CQRS, etc.) without approval.
+- **No new dependencies** or SDK/manifest changes without explicit user approval.
+- **Domain logic** changes require unit tests to pass or be updated.
+
+## Verification (after each batch)
+
+```bash
+./gradlew :app:testDebugUnitTest :app:assembleDebug
+```
+
+## Approval
+
+Cross-package or multi-file refactors: follow `chinese-listener-core.mdc` (plan in chat, wait for go ahead unless user already approved the work package).
+
+Skill: `.cursor/skills/chinese-listener-refactor/SKILL.md`

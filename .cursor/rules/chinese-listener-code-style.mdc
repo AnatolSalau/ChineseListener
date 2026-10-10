@@ -1,0 +1,53 @@
+---
+description: Kotlin write/refactor style — same patterns and collection approach as kotlin-mutliplatform-test (PATTERNS_REFERENCE, REFACTOR_GUIDE, no loops)
+globs: "**/*.kt"
+alwaysApply: true
+---
+
+# Kotlin code style (write + refactor)
+
+**Parity doc:** `docs/CODE_AND_REFACTOR_STYLE.md`. **Refactor batches:** `docs/REFACTOR_GUIDE.md` Phases 0–7 + `chinese-listener-refactor.mdc`.
+
+This repo follows the **same refactoring discipline** as `kotlin-mutliplatform-test`: pattern catalog, strict phases, audit, and **stdlib collection style** — adapted to single-module `:app` (see `ANDROID_PRACTICES.md`, not KMP source sets).
+
+## Collections (non-negotiable)
+
+`chinese-listener-kotlin-collections.mdc` applies. **No** imperative `for` / `while` / `do-while` in any Kotlin source (app + tests).
+
+- SSOT matrix: `docs/REFACTOR_PLAYBOOK.md` §4
+- Indexed scan / wrap helpers: `com.example.chineselistener.util.KotlinLoopReplacements` — extend there instead of adding loops
+
+## Modern Kotlin (every change)
+
+- `data class` + `copy` for state; `sealed interface` / `sealed class` for events, results, errors
+- `val` over `var`; avoid `!!` — `requireNotNull` or early return
+- Coroutines: `viewModelScope`, `StateFlow`, `update { }`; **no** `GlobalScope`
+- Domain: pure functions + collection ops; **no** `android.*` or Compose in `domain`
+- UDF: composables observe state and emit events only
+
+## Patterns (when designing or refactoring)
+
+Before introducing structure, pick names from `docs/PATTERNS_REFERENCE.md` (cite **PR-§*n*** in chat/audit):
+
+- **Layers:** PR-§3 layered / clean / ports & adapters (`ui` → `presentation` → `domain` ← `data`)
+- **Presentation:** UDF / MVVM-shaped — `StateFlow` + sealed events
+- **Data rim:** Repository, DTO mapper, anti-corruption at API boundary
+- **Behavioral:** Strategy, Command (events), Observer (`StateFlow`), Facade (composition root)
+
+Do **not** introduce microservices, CQRS, or event sourcing without explicit approval (REFACTOR_GUIDE in-scope list).
+
+## Refactor vs feature work
+
+| Work | Required |
+|------|----------|
+| New feature code | This rule + `chinese-listener-architecture.mdc` + collection rule |
+| Multi-file / style / structure | `chinese-listener-refactor.mdc` + REFACTOR_GUIDE Phases 0–7 + update `REFACTOR_AUDIT.md` |
+| Rename-only | Still no new loops; run unit tests if behavior touched |
+
+## Verification
+
+```text
+./gradlew :app:testDebugUnitTest :app:assembleDebug
+```
+
+Skill: `.cursor/skills/chinese-listener-kotlin-style/SKILL.md`

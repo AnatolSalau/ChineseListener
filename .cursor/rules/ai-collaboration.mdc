@@ -1,0 +1,36 @@
+---
+description: AI collaboration checklist — planning, scope, verification (complements chinese-listener-core.mdc)
+globs: "**/*"
+alwaysApply: false
+---
+
+# AI Collaboration Checklist
+
+Load with any substantial task (complements `chinese-listener-core.mdc`).
+
+## Before coding
+
+- [ ] If user used `@docs/WHAT_WE_DO.md`, read **full docs bundle** per `chinese-listener-docs-bundle.mdc`; otherwise read `docs/WHAT_WE_DO.md` + relevant docs. Always read `.cursor/rules/chinese-listener-architecture.mdc` for layer placement and power impact
+- [ ] Searched repo for existing patterns under `app/src/main`
+- [ ] Identified **affected packages** and **layer** (ui/presentation/domain/data)
+- [ ] Stated root cause or investigation gaps
+- [ ] Proposed plan; **user approved** (unless explicit skip)
+- [ ] Named verification: Gradle task + unit tests if logic changed + device/emulator if UI/Android
+- [ ] New/changed Kotlin follows `chinese-listener-code-style.mdc` (collections, no `for`/`while`; refactor batches use REFACTOR_GUIDE)
+
+## During implementation
+
+- [ ] Minimal diff; match existing package `com.example.chineselistener`; new code in correct subpackage (`ui`, `presentation`, `domain`, `data`, `theme`)
+- [ ] No new dependencies without approval and Gradle file update
+- [ ] No repository/network/DB calls from composables; no `GlobalScope`; no unapproved polling/wake locks (see `chinese-listener-energy-efficiency.mdc`)
+- [ ] `minSdk` / permissions unchanged unless in scope
+
+## After implementation
+
+- [ ] Ran verification or reported blockers
+- [ ] Summarized changes with `startLine:endLine:path` citations
+- [ ] Git read-only unless user asked for commits; **never push**
+
+## Plan quality
+
+Include behavior path (UI event → state → side effects), **energy impact** (foreground/background, cancellation), conventions used (with file refs), and regression check — not only a file list.

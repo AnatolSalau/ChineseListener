@@ -1,0 +1,37 @@
+---
+description: Energy efficiency — battery, CPU, network, background work, Compose performance (ChineseListener)
+globs: "**/*"
+alwaysApply: false
+---
+
+# Energy efficiency (mandatory)
+
+If the user referenced `@docs/WHAT_WE_DO.md`, read the full docs bundle (`chinese-listener-docs-bundle.mdc`). Otherwise read `docs/WHAT_WE_DO.md` (governance) and `docs/ENERGY_EFFICIENCY.md` (full practices).
+
+## Must
+
+- **Lifecycle-aware work** — cancel coroutines/flows when UI or feature scope ends; no `GlobalScope`.
+- **No polling by default** — prefer events, user refresh, or scheduled batch via deferrable background APIs on Android.
+- **Flow discipline** — `distinctUntilChanged` / debounce where appropriate; avoid emitting identical `UiState` in tight loops.
+- **Layered side effects** — battery/network/sensor code in **data** or platform adapters, not composables or domain.
+- **OLED-friendly UI** — explicit `colorScheme` text colors; prefer dark surfaces where product allows.
+- **Honest verification** — if claiming battery improvement, say whether profiler/idle test was run or mark unverified.
+
+## Must not (without explicit approval)
+
+- Foreground services, high-frequency location/BLE, `WAKE_LOCK`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`
+- Timers or `while(true)` loops on main thread or in presentation without backoff
+- Duplicate network/cache layers that refetch the same data on every recomposition or rotation
+
+## New dependencies
+
+WorkManager, location, analytics, push, heavy media pipelines — **user approval** + Gradle + manifest/permission review.
+
+## Verification
+
+```text
+./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleDebug
+```
+
+Add **domain/presentation tests** for schedulers and eligibility policies. Device smoke per `docs/RUN_ON_PHYSICAL_DEVICE.md` when background or permission behavior changes.
